@@ -1,0 +1,1 @@
+export default { session: {}, temp: {} };
