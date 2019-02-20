@@ -1,11 +1,19 @@
 {
   "name": "nodh",
+  "homepage": "http://fernandocamargo.com/nodh",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
+    "md5": "^2.2.1",
+    "prop-types": "^15.7.2",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
-    "react-scripts": "2.1.5"
+    "react-redux": "^6.0.1",
+    "react-scripts": "2.1.5",
+    "redux": "^4.0.1",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-persist": "^5.10.0",
+    "uuid": "^3.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
