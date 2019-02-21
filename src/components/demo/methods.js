@@ -5,7 +5,7 @@ export const fetchGithubRepos = () =>
     .then(response => response.json());
 
 // reducers
-export const newAttempt = () => ({ attempts, ...state }) => ({
+export const newAttempt = () => ({ attempts = 0, ...state }) => ({
   ...state,
   attempts: attempts + 1
 });
@@ -13,13 +13,13 @@ export const newAttempt = () => ({ attempts, ...state }) => ({
 export const setRepos = repos => state => ({ ...state, repos });
 
 // methods
-export default ({ session, temp, request }) => ({
+export default ({ session, temp, thread }) => ({
   getRepos: () =>
     fetchGithubRepos()
       .then(({ items }) => {
         temp.save(setRepos(items));
-        request.success("You could grab some response from your request");
+        thread.success("You could grab some response from your request");
       })
-      .catch(({ message }) => request.fail(message))
+      .catch(({ message }) => thread.fail(message))
       .finally(() => session.save(newAttempt()))
 });
