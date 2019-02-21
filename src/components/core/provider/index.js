@@ -1,6 +1,6 @@
 import isFunction from "lodash/isFunction";
 import React, { createElement } from "react";
-import { Provider as Redux } from "react-redux";
+import { StoreContext as Redux } from "redux-react-hook";
 import { PersistGate as ReduxPersist } from "redux-persist/integration/react";
 
 import { store, persistor } from "store";
@@ -16,7 +16,7 @@ export const render = component => {
 };
 
 export default component => (
-  <Redux store={store}>
+  <Redux.Provider value={store}>
     <ReduxPersist persistor={persistor}>{render(component)}</ReduxPersist>
-  </Redux>
+  </Redux.Provider>
 );
