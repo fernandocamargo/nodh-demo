@@ -1,4 +1,5 @@
 import first from "lodash/first";
+import attempt from "lodash/attempt";
 import md5 from "md5";
 import { v4 } from "uuid";
 import { useCallback, useEffect } from "react";
@@ -6,14 +7,14 @@ import { useMappedState, useDispatch } from "redux-react-hook";
 
 import replace from "helpers/object/replace";
 import NODH from "actions";
-import * as mutations from "mutations/volatile";
+import { create, destroy } from "mutations";
 import { selectVolatile } from "selectors";
 
 const mock = label => (...params) => {};
 
 const reserved = {
-  create: ({ volatile }) => () => volatile.save(mutations.create()),
-  destroy: ({ volatile }) => () => volatile.save(mutations.destroy())
+  create: ({ volatile }) => () => volatile.save(create()),
+  destroy: ({ volatile }) => () => volatile.save(destroy())
 };
 
 export default ({ namespace, actions }) => {
@@ -29,14 +30,17 @@ export default ({ namespace, actions }) => {
       const typify = level => `${NODH}: [${level}] ${location}();`;
       const save = path => mutation =>
         dispatch({ type: typify(first(path)), path, mutation });
-      const effect = action({
-        persisted: { save: save(["persisted"]) },
-        volatile: { save: save(["volatile", namespace]) },
-        thread: {
-          fail: mock("thread.fail"),
-          success: mock("thread.success")
-        }
-      })(...params);
+      const effect = attempt(
+        action({
+          persisted: { save: save(["persisted"]) },
+          volatile: { save: save(["volatile", namespace]) },
+          thread: {
+            fail: mock("thread.fail"),
+            success: mock("thread.success")
+          }
+        }),
+        ...params
+      );
       const asynchronous = effect instanceof Promise;
 
       console.log({ fingerprint, thread });
