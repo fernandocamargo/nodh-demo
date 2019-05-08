@@ -1,48 +1,101 @@
 import last from "lodash/last";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
-import { useSlot, useLog } from "components/core";
+import { usePersisted, useVolatile, useLog } from "components/core";
 
-import methods from "./methods";
+// async operation
+const fetchGithubRepos = () =>
+  window
+    .fetch("https://api.github.com/search/repositories?q=react")
+    .then(response => response.json());
 
-export const increment = value => value + 1;
+// reducers
+const newAttempt = () => ({ attempts = 0, ...state }) => ({
+  ...state,
+  attempts: attempts + 1
+});
 
-export default () => {
+const setRepos = repos => state => ({ ...state, repos });
+
+const incrementCounter = () => state => state + 1;
+
+// actions
+const actions = {
+  getRepos: ({ persisted, volatile, thread }) => () =>
+    fetchGithubRepos()
+      .then(({ items, total_count }) => {
+        volatile.save(setRepos(items));
+        thread.success(
+          `You could grab some response from your request, in this case, total of repos: ${total_count}`
+        );
+      })
+      .catch(({ message }) => thread.fail(message))
+      .finally(() => persisted.save(newAttempt()))
+};
+
+// selectors
+const selector = persisted => persisted;
+
+class Cycle {
+  constructor() {
+    this.cycles = 0;
+  }
+
+  count() {
+    return (this.cycles += 1);
+  }
+
+  reset() {
+    return (this.cycles = 0);
+  }
+}
+
+const cycle = new Cycle();
+
+const namespace = "demo";
+
+export default ({ onUnmount }) => {
+  const { attempts = 0 } = usePersisted({ selector });
+  const [{ repos = [] }, { getRepos }] = useVolatile({
+    namespace,
+    actions
+  });
+  const clickToGetRepos = useCallback(() => getRepos(), [getRepos]);
+  const { loading, error, success, repeat } = last(useLog(getRepos));
   const [counter, setCounter] = useState(0);
-  const incrementCounter = useCallback(() => setCounter(increment), []);
-  const [state, { getRepos, pinRepo }] = useSlot("demo", methods);
-  const clickToGetRepos = useCallback(() => getRepos(), []);
-  const clickToPinRepo = index => useCallback(() => pinRepo(index), [index]);
-  const { loading, error, success } = last(useLog(getRepos));
+  const clickToIncrementCounter = useCallback(
+    () => setCounter(incrementCounter()),
+    []
+  );
+  const clickToRepeat = useCallback(() => repeat(), [repeat]);
+  const clickToUnmount = useCallback(() => onUnmount(), [onUnmount]);
+  useEffect(() => {
+    return () => {
+      cycle.reset();
+    };
+  }, []);
 
   return (
     <div>
-      <h1>Demo (counter: {counter})</h1>
-      <button onClick={incrementCounter}>Increment counter</button>
-      <button onClick={clickToGetRepos}>Fetch repos</button>
-      <button onClick={clickToPinRepo(5)}>Pin repo at index #5</button>
-      <pre>{JSON.stringify(state, null, 2)}</pre>
-      <h2>Status</h2>
-      <dl>
-        <dt>Loading:</dt>
-        <dd>{String(loading)}</dd>
-      </dl>
+      <h1>Demo (cycles: {cycle.count()})</h1>
+      <h2>Counter: {counter}</h2>
+      <button onClick={clickToUnmount}>Unmount</button>
+      <button onClick={clickToIncrementCounter}>Increment counter</button>
+      <h2>Attempts to fetch repos: {attempts}</h2>
+      <button onClick={clickToGetRepos} disabled={loading}>
+        {loading ? "Loading..." : "Fetch repos"}
+      </button>
       {!!error && (
-        <dl>
-          <dt>Error:</dt>
-          <dd>
-            <pre>{JSON.stringify(error, null, 2)}</pre>
-          </dd>
-        </dl>
+        <div style={{ color: "red" }}>
+          <p>
+            <strong>Error:</strong>
+            <em>{error}</em>
+          </p>
+          <button onClick={clickToRepeat}>Try again</button>
+        </div>
       )}
-      {!!success && (
-        <dl>
-          <dt>success:</dt>
-          <dd>
-            <pre>{JSON.stringify(success, null, 2)}</pre>
-          </dd>
-        </dl>
-      )}
+      {!!success && <p style={{ color: "green" }}>{success}</p>}
+      <pre>{JSON.stringify(repos, null, 2)}</pre>
     </div>
   );
 };

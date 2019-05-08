@@ -1,22 +1,57 @@
-import isFunction from "lodash/isFunction";
-import React, { createElement } from "react";
+import update from "immutability-helper";
+import React, { memo, useState, useCallback } from "react";
 import { StoreContext as Redux } from "redux-react-hook";
 import { PersistGate as ReduxPersist } from "redux-persist/integration/react";
 
 import { store, persistor } from "store";
+import { Meta, Log } from "contexts";
+import { Renderer } from "components/core";
 
-export const create = component => props => createElement(component, props);
+export default memo(component => {
+  const [log, setLog] = useState({
+    actions: new Map(),
+    threads: new Map()
+  });
+  const register = useCallback(
+    ({ path, action, thread, params }) =>
+      setLog(state =>
+        update(state, {
+          actions: {
+            $apply: actions =>
+              actions.set(action, {
+                threads: (
+                  actions.get(action) || { threads: [] }
+                ).threads.concat(thread),
+                path
+              })
+          },
+          threads: {
+            $add: [
+              [
+                thread,
+                {
+                  begin: new Date().getTime(),
+                  loading: true,
+                  action,
+                  params
+                }
+              ]
+            ]
+          }
+        })
+      ),
+    []
+  );
 
-export const transpass = ({ children }) => children;
-
-export const render = component => {
-  const format = isFunction(component) ? create : transpass;
-
-  return format(component);
-};
-
-export default component => (
-  <Redux.Provider value={store}>
-    <ReduxPersist persistor={persistor}>{render(component)}</ReduxPersist>
-  </Redux.Provider>
-);
+  return (
+    <Redux.Provider value={store}>
+      <Meta.Provider>
+        <Log.Provider value={{ log, register }}>
+          <ReduxPersist persistor={persistor}>
+            <Renderer>{component}</Renderer>
+          </ReduxPersist>
+        </Log.Provider>
+      </Meta.Provider>
+    </Redux.Provider>
+  );
+});
