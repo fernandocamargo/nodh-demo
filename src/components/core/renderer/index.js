@@ -1,11 +1,11 @@
 import isFunction from "lodash/isFunction";
 import property from "lodash/property";
-import { memo, createElement } from "react";
+import { memo } from "react";
 
-const create = component => props => createElement(component, props);
+import render from "helpers/react/render";
 
 export default memo(({ children }) => {
-  const format = isFunction(children) ? create : property("children");
+  const format = isFunction(children) ? render : property("children");
 
   return format(children);
 });
