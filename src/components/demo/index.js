@@ -6,7 +6,7 @@ import { usePersisted, useVolatile, useLog } from "components/core";
 // async operation
 const fetchGithubRepos = () =>
   window
-    .fetch("https://api.github.com/search/repositories?q=react")
+    .fetch("https://api.github.com/search/repositories?q=react&sort=stars")
     .then(response => response.json());
 
 // reducers
