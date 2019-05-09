@@ -11,15 +11,16 @@ const getGithubAPI = () =>
     .filter(Boolean)
     .join("");
 
+const delay = (event, time) =>
+  new Promise(resolve => window.setTimeout(() => resolve(event), time));
+
 // async operation
 const fetchGithubRepos = () =>
-  window
-    .fetch(getGithubAPI())
-    .then(response =>
-      response.ok
-        ? response.json()
-        : Promise.reject({ message: response.statusText })
-    );
+  delay(window.fetch(getGithubAPI()), 5000).then(response =>
+    response.ok
+      ? response.json()
+      : Promise.reject({ message: response.statusText })
+  );
 
 // reducers
 const newAttempt = () => ({ attempts = 0, ...state }) => ({
@@ -64,7 +65,7 @@ class Cycle {
 
 const cycle = new Cycle();
 
-const namespace = "demo";
+const namespace = "github";
 
 export default ({ onUnmount }) => {
   const { attempts = 0 } = usePersisted({ selector });
@@ -73,7 +74,8 @@ export default ({ onUnmount }) => {
     actions
   });
   const clickToGetRepos = useCallback(() => getRepos(), [getRepos]);
-  const { loading, error, success, repeat } = last(useLog(getRepos));
+  const { loading, error, output, repeat } =
+    last(useLog({ action: getRepos })) || {};
   const [counter, setCounter] = useState(0);
   const clickToIncrementCounter = useCallback(
     () => setCounter(incrementCounter()),
@@ -81,15 +83,11 @@ export default ({ onUnmount }) => {
   );
   const clickToRepeat = useCallback(() => repeat(), [repeat]);
   const clickToUnmount = useCallback(() => onUnmount(), [onUnmount]);
-  useEffect(() => {
-    return () => {
-      cycle.reset();
-    };
-  }, []);
+  useEffect(() => () => cycle.reset(), []);
 
   return (
     <div>
-      <h1>Demo (cycles: {cycle.count()})</h1>
+      <h1>Github repos for "React" (cycles: {cycle.count()})</h1>
       <h2>Counter: {counter}</h2>
       <button onClick={clickToUnmount}>Unmount</button>
       <button onClick={clickToIncrementCounter}>Increment counter</button>
@@ -100,13 +98,13 @@ export default ({ onUnmount }) => {
       {!!error && (
         <div style={{ color: "red" }}>
           <p>
-            <strong>Error:</strong>
+            <strong>Error: </strong>
             <em>{error}</em>
           </p>
           <button onClick={clickToRepeat}>Try again</button>
         </div>
       )}
-      {!!success && <p style={{ color: "green" }}>{success}</p>}
+      {!!output && <p style={{ color: "green" }}>{output}</p>}
       <pre>{JSON.stringify(repos, null, 2)}</pre>
     </div>
   );

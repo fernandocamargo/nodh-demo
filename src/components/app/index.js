@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, Fragment } from "react";
 
 import { Provider as Curse } from "components/core";
 import Demo from "components/demo";
@@ -11,7 +11,9 @@ export default () => {
   return (
     <Curse>
       {!!mounted ? (
-        <Demo onUnmount={toggleMount} />
+        <Fragment>
+          <Demo onUnmount={toggleMount} />
+        </Fragment>
       ) : (
         <button onClick={clickToToggleMount}>Mount</button>
       )}

@@ -41,10 +41,7 @@ export default ({ namespace, actions }) => {
             callback({
               persisted: { save: save(["persisted"]) },
               volatile: { save: save(["volatile", namespace]) },
-              thread: {
-                fail: conclude("error"),
-                success: conclude("output")
-              }
+              thread: { fail: conclude("error"), success: conclude("output") }
             }),
             ...params
           );
