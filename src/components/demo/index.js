@@ -3,11 +3,23 @@ import React, { useState, useCallback, useEffect } from "react";
 
 import { usePersisted, useVolatile, useLog } from "components/core";
 
+const getGithubAPI = () =>
+  [
+    "https://api.github.com/search/repositories",
+    !!Math.round(Math.random()) && "?q=react&sort=stars"
+  ]
+    .filter(Boolean)
+    .join("");
+
 // async operation
 const fetchGithubRepos = () =>
   window
-    .fetch("https://api.github.com/search/repositories?q=react&sort=stars")
-    .then(response => response.json());
+    .fetch(getGithubAPI())
+    .then(response =>
+      response.ok
+        ? response.json()
+        : Promise.reject({ message: response.statusText })
+    );
 
 // reducers
 const newAttempt = () => ({ attempts = 0, ...state }) => ({
