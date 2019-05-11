@@ -1,8 +1,16 @@
 import last from "lodash/last";
-import React, { useState, useCallback, useEffect } from "react";
+import without from "lodash/without";
+import React, { memo, useState, useCallback, useEffect } from "react";
 
+import Cycle from "helpers/react/cycle";
 import { usePersisted, useVolatile, useLog } from "components/core";
+import Repo from "components/repo";
 
+// helpers
+const sleep = duration =>
+  new Promise(resolve => window.setTimeout(resolve, duration));
+
+// services
 const getGithubAPI = () =>
   [
     "https://api.github.com/search/repositories",
@@ -11,16 +19,15 @@ const getGithubAPI = () =>
     .filter(Boolean)
     .join("");
 
-const delay = (event, time) =>
-  new Promise(resolve => window.setTimeout(() => resolve(event), time));
-
 // async operation
 const fetchGithubRepos = () =>
-  delay(window.fetch(getGithubAPI()), 5000).then(response =>
-    response.ok
-      ? response.json()
-      : Promise.reject({ message: response.statusText })
-  );
+  window
+    .fetch(getGithubAPI())
+    .then(response =>
+      response.ok
+        ? response.json()
+        : Promise.reject({ message: response.statusText })
+    );
 
 // reducers
 const newAttempt = () => ({ attempts = 0, ...state }) => ({
@@ -31,6 +38,11 @@ const newAttempt = () => ({ attempts = 0, ...state }) => ({
 const setRepos = repos => state => ({ ...state, repos });
 
 const incrementCounter = () => state => state + 1;
+
+const toggleLike = id => ({ liked = [], ...state }) => ({
+  ...state,
+  liked: !liked.includes(id) ? liked.concat(id) : without(liked, id)
+});
 
 // actions
 const actions = {
@@ -43,46 +55,41 @@ const actions = {
         );
       })
       .catch(({ message }) => thread.fail(message))
-      .finally(() => persisted.save(newAttempt()))
+      .finally(() => persisted.save(newAttempt())),
+  like: ({ persisted, thread }) => id =>
+    sleep(5000).then(() => {
+      persisted.save(toggleLike(id));
+      thread.success();
+    })
 };
 
 // selectors
 const selector = persisted => persisted;
 
-class Cycle {
-  constructor() {
-    this.cycles = 0;
-  }
-
-  count() {
-    return (this.cycles += 1);
-  }
-
-  reset() {
-    return (this.cycles = 0);
-  }
-}
-
 const cycle = new Cycle();
 
-const namespace = "github";
-
-export default ({ onUnmount }) => {
-  const { attempts = 0 } = usePersisted({ selector });
-  const [{ repos = [] }, { getRepos }] = useVolatile({
-    namespace,
+export default memo(({ onUnmount }) => {
+  const { attempts = 0, liked = [] } = usePersisted({ selector });
+  const [{ repos = [] }, { getRepos, like }] = useVolatile({
+    namespace: "github",
     actions
   });
   const clickToGetRepos = useCallback(() => getRepos(), [getRepos]);
-  const { loading, error, output, repeat } =
-    last(useLog({ action: getRepos })) || {};
+  const { loading, error, output } = last(useLog({ action: getRepos })) || {};
   const [counter, setCounter] = useState(0);
   const clickToIncrementCounter = useCallback(
     () => setCounter(incrementCounter()),
     []
   );
-  const clickToRepeat = useCallback(() => repeat(), [repeat]);
   const clickToUnmount = useCallback(() => onUnmount(), [onUnmount]);
+  const renderRepos = useCallback(
+    repo => {
+      const { id } = repo;
+
+      return <Repo key={id} {...repo} liked={liked.includes(id)} like={like} />;
+    },
+    [liked, like]
+  );
   useEffect(() => () => cycle.reset(), []);
 
   return (
@@ -93,19 +100,18 @@ export default ({ onUnmount }) => {
       <button onClick={clickToIncrementCounter}>Increment counter</button>
       <h2>Attempts to fetch repos: {attempts}</h2>
       <button onClick={clickToGetRepos} disabled={loading}>
-        {loading ? "Loading..." : "Fetch repos"}
+        Fetch repos {loading && "(loading...)"}
       </button>
       {!!error && (
-        <div style={{ color: "red" }}>
-          <p>
-            <strong>Error: </strong>
-            <em>{error}</em>
-          </p>
-          <button onClick={clickToRepeat}>Try again</button>
-        </div>
+        <p style={{ color: "red" }}>
+          <strong>Error: </strong>
+          <em>{error}</em>
+        </p>
       )}
       {!!output && <p style={{ color: "green" }}>{output}</p>}
-      <pre>{JSON.stringify(repos, null, 2)}</pre>
+      {!loading && !!repos.length && (
+        <blockquote>{repos.map(renderRepos)}</blockquote>
+      )}
     </div>
   );
-};
+});
