@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import replace from "helpers/object/replace";
 // import { Log } from "contexts";
 import NODH from "constants/core";
-import volatile from "actions/volatile";
+import { volatile } from "actions";
 import select from "selectors";
 
 export default ({ namespace, selector, actions }) => {

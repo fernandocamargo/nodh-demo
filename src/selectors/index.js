@@ -1,30 +1,9 @@
-import isEqual from "lodash/isEqual";
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
 
-const getShallowMemoizedSelector = selector => {
-  let latestResult;
-
-  return state => {
-    const result = selector(state);
-
-    return (latestResult = isEqual(result, latestResult)
-      ? latestResult
-      : result);
-  };
-};
-
-const useObjectSelector = selector => {
-  const memoizedSelector = useMemo(() => getShallowMemoizedSelector(selector), [
-    selector
-  ]);
-
-  return useSelector(memoizedSelector);
-};
+import useSelector from "helpers/react-redux/selector";
 
 export default ({ namespace, selector }) => () =>
-  useObjectSelector(
+  useSelector(
     createSelector(
       ({ persisted }) => persisted,
       ({ session }) => session,

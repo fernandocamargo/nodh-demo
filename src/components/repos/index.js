@@ -72,6 +72,8 @@ const selector = ({
   repos
 });
 
+const style = { cursor: "pointer", padding: "10px" };
+
 export default memo(({ onUnmount }) => {
   const [{ attempts, liked, repos }, { getRepos, like }] = useActions({
     namespace: "github",
@@ -79,10 +81,7 @@ export default memo(({ onUnmount }) => {
     actions
   });
   const clickToGetRepos = useCallback(() => getRepos(), [getRepos]);
-  // const { loading, error, output } = last(useLog({ action: getRepos })) || {};
-  const loading = false;
-  const error = undefined;
-  const output = undefined;
+  const { loading, error, output } = last(useLog({ action: getRepos })) || {};
   const [counter, setCounter] = useState(0);
   const clickToIncrementCounter = useCallback(
     () => setCounter(incrementCounter()),
@@ -102,10 +101,14 @@ export default memo(({ onUnmount }) => {
     <div>
       <h1>Github repos for "React"</h1>
       <h2>Counter: {counter}</h2>
-      <button onClick={clickToUnmount}>Unmount</button>
-      <button onClick={clickToIncrementCounter}>Increment counter</button>
+      <button onClick={clickToUnmount} style={style}>
+        Unmount
+      </button>
+      <button onClick={clickToIncrementCounter} style={style}>
+        Increment counter
+      </button>
       <h2>Attempts to fetch repos: {attempts}</h2>
-      <button onClick={clickToGetRepos} disabled={loading}>
+      <button onClick={clickToGetRepos} style={style} disabled={loading}>
         Fetch repos {loading && "(loading...)"}
       </button>
       {!!error && (
@@ -115,7 +118,7 @@ export default memo(({ onUnmount }) => {
         </p>
       )}
       {!!output && <p style={{ color: "green" }}>{output}</p>}
-      {!loading && !!repos.length && (
+      {!loading && !error && !!repos.length && (
         <blockquote>{repos.map(renderRepos)}</blockquote>
       )}
     </div>
