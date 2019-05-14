@@ -1,38 +1,44 @@
-import React, { useCallback, useEffect } from "react";
+import React, { memo, useCallback } from "react";
 
-import Cycle from "helpers/react/cycle";
-import { usePersisted, useVolatile } from "components/core";
+import { useActions } from "components/core";
 
 // reducers
 const setName = name => state => ({ ...state, name });
 
+const setSize = size => state => ({ ...state, size });
+
 // actions
 const actions = {
-  setNameFromField: ({ persisted }) => name => persisted.save(setName(name))
+  setNameFromField: ({ persisted, volatile }) => name => {
+    persisted.save(setName(name));
+    volatile.save(setSize(name.length));
+  }
 };
 
-// selectors
-const selector = ({ name }) => ({ name });
+// selector
+const selector = ({
+  persisted: { name = "Anonymous" },
+  volatile: { size = 0 }
+}) => ({ name, size });
 
-const cycle = new Cycle();
-
-export default () => {
-  const { name = "Anonymous" } = usePersisted({ selector });
-  const [_, { setNameFromField }] = useVolatile({
-    namespace: "input-name",
+export default memo(() => {
+  const [{ name, size }, { setNameFromField }] = useActions({
+    namespace: "user",
+    selector,
     actions
   });
   const changeToUpdateName = useCallback(
     ({ target: { value } }) => setNameFromField(value),
     [setNameFromField]
   );
-  useEffect(() => () => cycle.reset(), []);
 
   return (
     <div>
-      <h1>Tell us your name (cycles: {cycle.count()})</h1>
-      <p>Your name: {name}</p>
-      <input onChange={changeToUpdateName} />
+      <h1>Tell us your name</h1>
+      <p>
+        Your name: {name} (size: {size})
+      </p>
+      <input defaultValue={name} onChange={changeToUpdateName} />
     </div>
   );
-};
+});

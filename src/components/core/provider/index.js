@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback } from "react";
-import { StoreContext as Redux } from "redux-react-hook";
+import { Provider as Redux } from "react-redux";
 import { PersistGate as ReduxPersist } from "redux-persist/integration/react";
 
 import { store, persistor } from "store";
@@ -13,7 +13,7 @@ export default memo(component => {
   const update = useCallback(details => setLog(end(details)), []);
 
   return (
-    <Redux.Provider value={store}>
+    <Redux store={store}>
       <Meta.Provider>
         <Log.Provider value={{ log, register, update }}>
           <ReduxPersist persistor={persistor} loading="Loading...">
@@ -21,6 +21,6 @@ export default memo(component => {
           </ReduxPersist>
         </Log.Provider>
       </Meta.Provider>
-    </Redux.Provider>
+    </Redux>
   );
 });

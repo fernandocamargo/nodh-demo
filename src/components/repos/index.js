@@ -1,9 +1,8 @@
 import last from "lodash/last";
 import without from "lodash/without";
-import React, { memo, useState, useCallback, useEffect } from "react";
+import React, { memo, useState, useCallback } from "react";
 
-import Cycle from "helpers/react/cycle";
-import { usePersisted, useVolatile, useLog } from "components/core";
+import { useActions, useLog } from "components/core";
 import Repo from "components/repo";
 
 // helpers
@@ -63,19 +62,27 @@ const actions = {
     })
 };
 
-// selectors
-const selector = persisted => persisted;
-
-const cycle = new Cycle();
+// selector
+const selector = ({
+  persisted: { attempts = 0, liked = [] },
+  volatile: { repos = [] }
+}) => ({
+  attempts,
+  liked,
+  repos
+});
 
 export default memo(({ onUnmount }) => {
-  const { attempts = 0, liked = [] } = usePersisted({ selector });
-  const [{ repos = [] }, { getRepos, like }] = useVolatile({
+  const [{ attempts, liked, repos }, { getRepos, like }] = useActions({
     namespace: "github",
+    selector,
     actions
   });
   const clickToGetRepos = useCallback(() => getRepos(), [getRepos]);
-  const { loading, error, output } = last(useLog({ action: getRepos })) || {};
+  // const { loading, error, output } = last(useLog({ action: getRepos })) || {};
+  const loading = false;
+  const error = undefined;
+  const output = undefined;
   const [counter, setCounter] = useState(0);
   const clickToIncrementCounter = useCallback(
     () => setCounter(incrementCounter()),
@@ -90,11 +97,10 @@ export default memo(({ onUnmount }) => {
     },
     [liked, like]
   );
-  useEffect(() => () => cycle.reset(), []);
 
   return (
     <div>
-      <h1>Github repos for "React" (cycles: {cycle.count()})</h1>
+      <h1>Github repos for "React"</h1>
       <h2>Counter: {counter}</h2>
       <button onClick={clickToUnmount}>Unmount</button>
       <button onClick={clickToIncrementCounter}>Increment counter</button>
