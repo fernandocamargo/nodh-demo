@@ -6,7 +6,7 @@ import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 import replace from "helpers/object/replace";
-import NODH from "constants";
+import NODH from "constants/index";
 import { log } from "store";
 import { start, end } from "mutations";
 import { volatile } from "actions";

@@ -1,7 +1,7 @@
 import get from "lodash/get";
 import attempt from "lodash/attempt";
 
-import NODH from "constants";
+import NODH from "constants/index";
 import { set } from "mutations";
 
 const getInitialState = () => ({ persisted: {}, session: {}, volatile: {} });
