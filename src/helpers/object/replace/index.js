@@ -1,6 +1,8 @@
+import isFunction from "lodash/isFunction";
+
 const replace = (object, path = []) => ({
-  with: replacement =>
-    Object.entries(object).reduce((stack, [key, value]) => {
+  with: replacement => {
+    const dig = (stack, [key, value]) => {
       const deep = !!Object.keys(value).length;
       const location = path.concat(key);
 
@@ -9,7 +11,12 @@ const replace = (object, path = []) => ({
           ? replace(value, location).with(replacement)
           : replacement(location, value)
       });
-    }, {})
+    };
+
+    return !isFunction(replacement)
+      ? object
+      : Object.entries(object).reduce(dig, {});
+  }
 });
 
 export default replace;

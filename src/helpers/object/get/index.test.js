@@ -1,6 +1,6 @@
 import get from "./";
 
-const getMap = () =>
+const create = () =>
   new Map().set(
     "a",
     new Map().set(
@@ -16,18 +16,18 @@ const getMap = () =>
   );
 
 test("Should return the value at path of object.", () => {
-  const map = getMap();
+  const object = create();
   const path = ["a", "b", "c", "d", "e", "f", "g", "h"];
-  const output = get(map, path);
+  const output = get(object, path);
   const expected = "ijl";
 
   expect(output).toBe(expected);
 });
 
 test("Should return the value at path of object.", () => {
-  const map = getMap();
+  const object = create();
   const path = ["a", "b", "c", "d", "e", "f", "g", "h", 1];
-  const output = get(map, path);
+  const output = get(object, path);
   const expected = "j";
 
   expect(output).toBe(expected);
@@ -36,18 +36,18 @@ test("Should return the value at path of object.", () => {
 test(`
   Should return the value at path of object. If the resolved
   value is undefined, the defaultValue is returned in its place.
-  `, () => {
-  const map = getMap();
+`, () => {
+  const object = create();
   const path = ["a", "b", "c", "d", "e", "f", "g", "l"];
   const defaultValue = 123;
-  const output = get(map, path, defaultValue);
+  const output = get(object, path, defaultValue);
 
   expect(output).toBe(defaultValue);
 });
 
 test("Should return the object when path isn't an array.", () => {
-  const map = getMap();
-  const output = get(map);
+  const object = create();
+  const output = get(object);
 
-  expect(output).toStrictEqual(map);
+  expect(output).toStrictEqual(object);
 });
