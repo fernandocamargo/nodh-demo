@@ -72,8 +72,6 @@ const selector = ({
   repos
 });
 
-const style = { cursor: "pointer", padding: "10px" };
-
 export default ({ onUnmount }) => {
   const [{ attempts, liked, repos }, { getRepos, like }] = useActions({
     namespace: "github",
@@ -101,14 +99,10 @@ export default ({ onUnmount }) => {
     <div>
       <h1>Github repos for "React"</h1>
       <h2>Counter: {counter}</h2>
-      <button onClick={clickToUnmount} style={style}>
-        Unmount
-      </button>
-      <button onClick={clickToIncrementCounter} style={style}>
-        Increment counter
-      </button>
+      <button onClick={clickToUnmount}>Unmount</button>
+      <button onClick={clickToIncrementCounter}>Increment counter</button>
       <h2>Attempts to fetch repos: {attempts}</h2>
-      <button onClick={clickToGetRepos} style={style} disabled={loading}>
+      <button onClick={clickToGetRepos} disabled={loading}>
         Fetch repos {loading && "(loading...)"}
       </button>
       {!!error && (
