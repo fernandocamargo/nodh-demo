@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 
 import { useActions, useLog } from "components/core";
 import Repo from "components/repo";
+import Thread from "components/thread";
 
 // helpers
 const sleep = duration =>
@@ -79,7 +80,8 @@ export default ({ onUnmount }) => {
     actions
   });
   const clickToGetRepos = useCallback(() => getRepos(), [getRepos]);
-  const { loading, error, output } = last(useLog({ action: getRepos }));
+  const thread = last(useLog({ action: getRepos }));
+  const { loading, error } = thread;
   const [counter, setCounter] = useState(0);
   const clickToIncrementCounter = useCallback(
     () => setCounter(incrementCounter()),
@@ -105,13 +107,7 @@ export default ({ onUnmount }) => {
       <button onClick={clickToGetRepos} disabled={loading}>
         Fetch repos {loading && "(loading...)"}
       </button>
-      {!!error && (
-        <p style={{ color: "red" }}>
-          <strong>Error: </strong>
-          <em>{error}</em>
-        </p>
-      )}
-      {!!output && <p style={{ color: "green" }}>{output}</p>}
+      <Thread {...thread} />
       {!loading && !error && !!repos.length && (
         <blockquote>{repos.map(renderRepos)}</blockquote>
       )}

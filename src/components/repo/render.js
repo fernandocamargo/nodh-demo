@@ -2,6 +2,7 @@ import last from "lodash/last";
 import React, { useCallback } from "react";
 
 import { useLog } from "components/core";
+import Thread from "components/thread";
 
 export default ({
   id,
@@ -13,7 +14,8 @@ export default ({
   like
 }) => {
   const clickToLike = useCallback(() => like(id), [like, id]);
-  const { loading, error, output } = last(useLog({ action: like }, [id]));
+  const thread = last(useLog({ action: like }, [id]));
+  const { loading } = thread;
 
   return (
     <dl>
@@ -32,13 +34,7 @@ export default ({
         <button onClick={clickToLike} disabled={loading}>
           {!liked ? "Like" : "Dislike"} {loading && "(loading...)"}
         </button>
-        {!!error && (
-          <p style={{ color: "red" }}>
-            <strong>Error: </strong>
-            <em>{error}</em>
-          </p>
-        )}
-        {!!output && <p style={{ color: "green" }}>{output}</p>}
+        <Thread {...thread} />
       </dd>
     </dl>
   );
