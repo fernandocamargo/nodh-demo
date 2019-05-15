@@ -1,4 +1,4 @@
-import replace from "./";
+import replace from ".";
 
 const create = () => ({
   a: () => "a",

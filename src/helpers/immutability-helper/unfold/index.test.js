@@ -1,4 +1,4 @@
-import unfold from "./";
+import unfold from ".";
 
 test(`
   Should convert the provided path into an object representing

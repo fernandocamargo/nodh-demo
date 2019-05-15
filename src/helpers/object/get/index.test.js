@@ -1,4 +1,4 @@
-import get from "./";
+import get from ".";
 
 const create = () =>
   new Map().set(
