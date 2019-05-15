@@ -1,7 +1,7 @@
 import React, { useState, useCallback, Fragment } from "react";
 
-import { name } from "package";
-import { Provider as NODH } from "components/core";
+import { NODH } from "constants/index";
+import { Provider as Curse } from "components/core";
 import User from "components/user";
 import Repos from "components/repos";
 
@@ -11,7 +11,7 @@ export default () => {
   const clickToToggleMount = useCallback(() => toggleMount(), [toggleMount]);
 
   return (
-    <NODH name={name}>
+    <Curse name={NODH}>
       {!!mounted ? (
         <Fragment>
           <User />
@@ -20,6 +20,6 @@ export default () => {
       ) : (
         <button onClick={clickToToggleMount}>Mount</button>
       )}
-    </NODH>
+    </Curse>
   );
 };
