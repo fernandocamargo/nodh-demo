@@ -5,24 +5,17 @@ import { useActions } from "components/core";
 // reducers
 const setName = name => state => ({ ...state, name });
 
-const setSize = size => state => ({ ...state, size });
-
 // actions
 const actions = {
-  setNameFromField: ({ persisted, volatile }) => name => {
-    persisted.save(setName(name));
-    volatile.save(setSize(name.length));
-  }
+  setNameFromField: ({ persisted, volatile, thread }) => name =>
+    persisted.save(setName(name))
 };
 
 // selector
-const selector = ({
-  persisted: { name = "Anonymous" },
-  volatile: { size = 0 }
-}) => ({ name, size });
+const selector = ({ persisted: { name = "Anonymous" } }) => ({ name });
 
 export default memo(() => {
-  const [{ name, size }, { setNameFromField }] = useActions({
+  const [{ name }, { setNameFromField }] = useActions({
     namespace: "user",
     selector,
     actions
@@ -35,9 +28,7 @@ export default memo(() => {
   return (
     <div>
       <h1>Tell us your name</h1>
-      <p>
-        Your name: {name} (size: {size})
-      </p>
+      <p>Your name: {name}</p>
       <input defaultValue={name} onChange={changeToUpdateName} />
     </div>
   );
