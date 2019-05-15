@@ -6,8 +6,7 @@ import { useLog } from "components/core";
 export default memo(
   ({ id, name, full_name, description, html_url, liked, like }) => {
     const clickToLike = useCallback(() => like(id), [like, id]);
-    const { loading, error, output } =
-      last(useLog({ action: like }, [id])) || {};
+    const { loading, error, output } = last(useLog({ action: like }, [id]));
 
     return (
       <dl>

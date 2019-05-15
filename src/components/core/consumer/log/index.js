@@ -1,25 +1,28 @@
 import isEqual from "lodash/isEqual";
-import { useContext, useCallback } from "react";
+import { useCallback } from "react";
+import { useStoreState } from "pullstate";
 
-import { Log } from "contexts";
+import { log } from "store";
 
 export default ({ action: { fingerprint } }, params) => {
-  const {
-    log: { actions, threads }
-  } = useContext(Log);
-  const getLog = useCallback(() => {
-    const log = actions.has(fingerprint)
-      ? actions.get(fingerprint).threads
-      : [];
+  const getLog = useCallback(
+    () =>
+      useStoreState(log, ({ actions, threads }) => {
+        const lol = actions.has(fingerprint)
+          ? actions.get(fingerprint).threads
+          : [];
+        const rofl = lol.reduce((stack, thread) => {
+          const details = threads.get(thread);
 
-    return log.reduce((stack, thread) => {
-      const details = threads.get(thread);
+          return !params || isEqual(details.params, params)
+            ? stack.concat(details)
+            : stack;
+        }, []);
 
-      return !params || isEqual(details.params, params)
-        ? stack.concat(details)
-        : stack;
-    }, []);
-  }, [actions, threads, fingerprint, params]);
+        return !!rofl.length ? rofl : [{}];
+      }),
+    [fingerprint, params]
+  );
 
   return getLog();
 };

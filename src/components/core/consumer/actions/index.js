@@ -1,19 +1,18 @@
 import first from "lodash/first";
 import attempt from "lodash/attempt";
 import md5 from "md5";
-// import { v4 } from "uuid";
-// import { useContext, useCallback, useEffect } from "react";
+import { v4 } from "uuid";
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 import replace from "helpers/object/replace";
-// import { Log } from "contexts";
-import NODH from "constants/core";
+import NODH from "constants";
+import { log } from "store";
+import { start, end } from "mutations";
 import { volatile } from "actions";
 import select from "selectors";
 
 export default ({ namespace, selector, actions }) => {
-  // const { register, update } = useContext(Log);
   const dispatch = useDispatch();
   const useState = useCallback(select({ namespace, selector }), [
     namespace,
@@ -27,7 +26,7 @@ export default ({ namespace, selector, actions }) => {
 
       return Object.assign(
         (...params) => {
-          // const thread = v4();
+          const thread = v4();
           const typify = level =>
             `${NODH}: [${first(level)}] ${location.join(".")}();`;
           const save = path => mutation => {
@@ -35,9 +34,8 @@ export default ({ namespace, selector, actions }) => {
 
             return fingerprint;
           };
-          const conclude = type => content => {
-            // return update({ [type]: content, thread });
-          };
+          const conclude = type => content =>
+            log.update(end({ [type]: content, thread }));
           const effect = attempt(
             callback({
               persisted: { save: save(["persisted"]) },
@@ -46,21 +44,24 @@ export default ({ namespace, selector, actions }) => {
             }),
             ...params
           );
-          // const loading = effect !== fingerprint;
+          const loading = effect !== fingerprint;
           const asynchronous = effect instanceof Promise;
 
-          // register({ namespace, path, fingerprint, thread, params, loading });
+          log.update(
+            start({ namespace, path, fingerprint, thread, params, loading })
+          );
 
           return asynchronous ? effect : Promise.resolve(effect);
         },
         { fingerprint }
       );
     },
-    // [namespace, dispatch, register, update]
     [namespace, dispatch]
   );
-
-  // console.log(useObjectSelector(state => state));
+  const useActions = useCallback(() => replace(actions).with(connect), [
+    actions,
+    connect
+  ]);
 
   useEffect(() => {
     const { mount, unmount } = replace(volatile).with(connect);
@@ -70,5 +71,5 @@ export default ({ namespace, selector, actions }) => {
     return () => unmount();
   }, [connect]);
 
-  return [useState(), replace(actions).with(connect)];
+  return [useState(), useActions()];
 };

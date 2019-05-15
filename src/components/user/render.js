@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { useCallback } from "react";
 
 import { useActions } from "components/core";
 
@@ -14,7 +14,7 @@ const actions = {
 // selector
 const selector = ({ persisted: { name = "Anonymous" } }) => ({ name });
 
-export default memo(() => {
+export default () => {
   const [{ name }, { setNameFromField }] = useActions({
     namespace: "user",
     selector,
@@ -32,4 +32,4 @@ export default memo(() => {
       <input defaultValue={name} onChange={changeToUpdateName} />
     </div>
   );
-});
+};
