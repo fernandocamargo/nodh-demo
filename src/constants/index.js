@@ -1,1 +1,3 @@
-export default "🧠";
+export const EMPTY_LOG = [{}];
+
+export const NODH = "🧠";
