@@ -118,6 +118,27 @@ test("Should return the object when isn't iterable.", () => {
 });
 
 test("Should return the object when isn't iterable.", () => {
+  const tree = undefined;
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = null;
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = undefined;
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
   const tree = [];
   const output = replace(tree).with(replacement);
 

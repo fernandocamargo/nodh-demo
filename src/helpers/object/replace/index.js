@@ -5,7 +5,7 @@ const deflate = object => (Array.isArray(object) ? [] : {});
 
 const replace = (object, path = []) => ({
   with: replacement => {
-    const entries = Object.entries(object);
+    const entries = !!object ? Object.entries(object) : [];
     const skip =
       !isFunction(replacement) || isString(object) || !entries.length;
     const dig = (current, [key, value]) => {
