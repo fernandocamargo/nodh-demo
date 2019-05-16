@@ -78,6 +78,66 @@ test(`
   expect(expected.length).toBe(expected.filter(jest.isMockFunction).length);
 });
 
+test(`
+  Should recursively override the properties/positions of objects/arrays
+  by the output of the function provided as replacement.
+`, () => {
+  const tree = [1, 2, 3];
+  const output = replace(tree).with(replacement);
+  const expected = [output[0], output[1], output[2]];
+
+  expect(expected.length).toBe(expected.filter(jest.isMockFunction).length);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = new Date();
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = "123";
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = 123;
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = {};
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = [];
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = false;
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
+test("Should return the object when isn't iterable.", () => {
+  const tree = new Map();
+  const output = replace(tree).with(replacement);
+
+  expect(output).toBe(tree);
+});
+
 test("Should return the object/array when replacement isn't an function.", () => {
   const tree = create();
   const output = replace(tree).with();
