@@ -9,7 +9,9 @@ import useSelector from ".";
 
 const Mock = props => <Provider name={NODH} {...props} />;
 
-test("Something...", () => {
+test(`
+  Should extract data from the Redux store state, using a selector function.
+`, () => {
   const selector = ({ persisted, session, volatile }) => ({
     persisted,
     session,
