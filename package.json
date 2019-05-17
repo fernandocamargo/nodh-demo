@@ -33,5 +33,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "react-hooks-testing-library": "^0.5.0",
+    "react-test-renderer": "^16.8.6"
+  }
 }

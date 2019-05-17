@@ -1,18 +1,7 @@
-import isEqual from "lodash/isEqual";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
-class Cache {
-  constructor() {
-    this.current = null;
-  }
-
-  update(next) {
-    const { current } = this;
-
-    return (this.current = isEqual(current, next) ? current : next);
-  }
-}
+import Cache from "helpers/object/cache";
 
 const memoize = selector => {
   const cache = new Cache();

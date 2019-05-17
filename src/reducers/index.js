@@ -4,7 +4,11 @@ import attempt from "lodash/attempt";
 import { NODH } from "constants/index";
 import { set } from "mutations";
 
-const getInitialState = () => ({ persisted: {}, session: {}, volatile: {} });
+export const getInitialState = () => ({
+  persisted: {},
+  session: {},
+  volatile: {}
+});
 
 export default () => (state = getInitialState(), { type, path, mutation }) => {
   switch (true) {
