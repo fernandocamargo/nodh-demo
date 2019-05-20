@@ -11,6 +11,7 @@ export const set = ({ path, value }) => state =>
   update(state, unfold(path, value));
 
 export const start = ({
+  begin = performance.now(),
   fingerprint: action,
   namespace,
   path,
@@ -36,18 +37,21 @@ export const start = ({
         return actions.set(action, next);
       }
     },
-    threads: {
-      $add: [[thread, { begin: performance.now(), loading, action, params }]]
-    }
+    threads: { $add: [[thread, { begin, loading, action, params }]] }
   });
 
-export const end = ({ thread, output, error }) => state =>
+export const finish = ({
+  end = performance.now(),
+  thread,
+  output,
+  error
+}) => state =>
   update(state, {
     threads: {
       [thread]: {
         ...(!!output && { output: { $set: output } }),
         ...(!!error && { error: { $set: error } }),
-        end: { $set: performance.now() },
+        end: { $set: end },
         loading: { $set: false }
       }
     }

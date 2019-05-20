@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import replace from "helpers/object/replace";
 import { NODH } from "constants/index";
 import { log } from "store";
-import { start, end } from "mutations";
+import { start, finish } from "mutations";
 import { volatile } from "actions";
 import select from "selectors";
 
@@ -35,7 +35,7 @@ export default ({ namespace, selector, actions }) => {
             return fingerprint;
           };
           const conclude = type => content =>
-            log.update(end({ [type]: content, thread }));
+            log.update(finish({ [type]: content, thread }));
           const effect = attempt(
             callback({
               persisted: { save: save(["persisted"]) },
