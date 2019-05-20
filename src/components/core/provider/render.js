@@ -8,7 +8,7 @@ import { data as getStore } from "store";
 
 const [store, persistor] = getStore();
 
-export default ({ name, children }) => {
+export default ({ children }) => {
   const Persistence = TESTING ? property("children") : ReduxPersist;
 
   return (
