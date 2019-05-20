@@ -4,10 +4,11 @@ import { Provider as Redux } from "react-redux";
 import { PersistGate as ReduxPersist } from "redux-persist/integration/react";
 
 import { TESTING } from "constants/index";
-import { data as useStore } from "store";
+import { data as getStore } from "store";
+
+const [store, persistor] = getStore();
 
 export default ({ name, children }) => {
-  const [store, persistor] = useStore(name);
   const Persistence = TESTING ? property("children") : ReduxPersist;
 
   return (

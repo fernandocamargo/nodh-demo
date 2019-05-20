@@ -74,7 +74,10 @@ const selector = ({
 });
 
 export default ({ onUnmount }) => {
-  const [{ attempts, liked, repos }, { getRepos, like }] = useActions({
+  const [
+    { attempts = 0, liked = [], repos = [] },
+    { getRepos, like }
+  ] = useActions({
     namespace: "github",
     selector,
     actions

@@ -19,6 +19,15 @@ export const start = ({
   loading
 }) => state =>
   update(state, {
+    namespaces: {
+      $apply: namespaces => {
+        const actions = namespaces.has(namespace)
+          ? namespaces.get(namespace)
+          : new Set();
+
+        return namespaces.set(namespace, actions.add(action));
+      }
+    },
     actions: {
       $apply: actions => {
         const threads = actions.has(action) ? actions.get(action).threads : [];
