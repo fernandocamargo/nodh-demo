@@ -1,7 +1,7 @@
 import md5 from "md5";
 import { v4 } from "uuid";
 
-import { mount, unmount, set, start, finish } from ".";
+import { mount, unmount, set, start, finish, clear } from ".";
 
 test("Mount.", () => {
   const current = undefined;
@@ -28,8 +28,8 @@ test("Set.", () => {
 });
 
 test("Start.", () => {
-  const fingerprint = v4();
   const namespace = "testing";
+  const fingerprint = v4();
   const path = ["fake"];
   const thread = md5(fingerprint);
   const params = [1, "a", false];
@@ -64,8 +64,8 @@ test("Start.", () => {
 });
 
 test("End.", () => {
-  const fingerprint = v4();
   const namespace = "testing";
+  const fingerprint = v4();
   const path = ["fake"];
   const thread = md5(fingerprint);
   const params = [1, "a", false];
@@ -93,6 +93,47 @@ test("End.", () => {
       begin,
       end
     })
+  };
+
+  expect(mutation(current)).toStrictEqual(next);
+});
+
+test("Clear.", () => {
+  const namespace = "testing";
+  const fingerprints = [v4(), v4(), v4()];
+  const paths = ["fake", "nonexistent", "unreal"];
+  const threads = fingerprints.map(fingerprint => md5(fingerprint));
+  const params = [1, "a", false];
+  const begin = performance.now();
+  const end = performance.now();
+  const current = {
+    namespaces: new Map().set(namespace, new Set(fingerprints)),
+    actions: fingerprints.reduce(
+      (stack, fingerprint, index) =>
+        stack.set(fingerprint, {
+          path: [paths[index]],
+          threads: [threads[index]],
+          namespace
+        }),
+      new Map()
+    ),
+    threads: threads.reduce(
+      (stack, thread, index) =>
+        stack.set(thread, {
+          action: fingerprints[index],
+          loading: false,
+          params,
+          begin,
+          end
+        }),
+      new Map()
+    )
+  };
+  const mutation = clear({ namespace });
+  const next = {
+    namespaces: new Map(),
+    actions: new Map(),
+    threads: new Map()
   };
 
   expect(mutation(current)).toStrictEqual(next);
