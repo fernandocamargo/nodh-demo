@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 
-import { useActions } from "components/core";
+import { useActions } from "hooks";
 
 // reducers
 const setName = name => state => ({ ...state, name });

@@ -2,7 +2,7 @@ import last from "lodash/last";
 import without from "lodash/without";
 import React, { useState, useCallback } from "react";
 
-import { useActions, useLog } from "components/core";
+import { useActions, useLog } from "hooks";
 import Repo from "components/repo";
 import Thread from "components/thread";
 

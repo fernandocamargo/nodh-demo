@@ -1,6 +1,6 @@
 import React, { useState, useCallback, Fragment } from "react";
 
-import { Provider as Curse } from "components/core";
+import Curse from "components/provider";
 import User from "components/user";
 import Repos from "components/repos";
 

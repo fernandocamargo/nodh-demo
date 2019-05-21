@@ -3,7 +3,7 @@ import { renderHook } from "react-hooks-testing-library";
 
 import { NODH } from "constants/index";
 import { getInitialState } from "reducers";
-import { Provider } from "components/core";
+import Provider from "components/provider";
 
 import useSelector from ".";
 

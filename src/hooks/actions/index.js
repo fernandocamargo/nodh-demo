@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import replace from "helpers/object/replace";
 import { NODH } from "constants/index";
 import { log } from "store";
-import { start, finish } from "mutations";
+import { start, finish, clear } from "mutations";
 import { volatile } from "actions";
 import select from "selectors";
 
@@ -68,8 +68,12 @@ export default ({ namespace, selector, actions }) => {
 
     mount();
 
-    return () => unmount();
-  }, [connect]);
+    return () => {
+      unmount();
+
+      log.update(clear({ namespace }));
+    };
+  }, [connect, namespace]);
 
   return [useState(), useActions()];
 };

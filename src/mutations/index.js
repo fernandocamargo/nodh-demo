@@ -56,3 +56,18 @@ export const finish = ({
       }
     }
   });
+
+export const clear = ({ namespace }) => state => {
+  const namespaces = [namespace];
+  const actions = [...state.namespaces.get(namespace)];
+  const threads = actions.reduce(
+    (stack, action) => stack.concat(state.actions.get(action).threads),
+    []
+  );
+
+  return update(state, {
+    namespaces: { $remove: namespaces },
+    actions: { $remove: actions },
+    threads: { $remove: threads }
+  });
+};
