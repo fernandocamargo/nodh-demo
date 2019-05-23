@@ -48,12 +48,12 @@ export default ({ namespace, selector, actions }) => {
           });
           const takeLatest = promise =>
             proxy.run(promise, { name: fingerprint, value: thread });
-          const wasDeclined = error => error instanceof Declined;
+          const isDeclined = error => error instanceof Declined;
           const resources = {
             persisted: { save: save(["persisted"]) },
             volatile: { save: save(["volatile", namespace]) },
             thread: { fail: conclude("error"), success: conclude("output") },
-            helpers: { takeEarly, takeLatest, wasDeclined }
+            helpers: { takeEarly, takeLatest, isDeclined }
           };
           const effect = attempt(action(...params), resources);
           const loading = effect !== fingerprint;

@@ -20,7 +20,7 @@ const setFlag = flag => state => ({ ...state, flag });
 // actions
 const actions = {
   setNameFromField: name => ({
-    helpers: { takeLatest, wasDeclined },
+    helpers: { takeLatest, isDeclined },
     volatile,
     thread
   }) =>
@@ -30,7 +30,7 @@ const actions = {
         thread.success("Updated!");
       })
       .catch(error => {
-        thread.fail(!wasDeclined(error) && error);
+        thread.fail(!isDeclined(error) && error);
       }),
   setFlagFromField: checked => ({
     helpers: { takeEarly },
