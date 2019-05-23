@@ -43,9 +43,6 @@ export default ({ namespace, selector, actions }) => {
           };
           const conclude = type => content =>
             log.update(finish({ [type]: content, thread }));
-          const takeEarly = promise => ({
-            as: mock => promise
-          });
           const takeLatest = promise =>
             proxy.run(promise, { name: fingerprint, value: thread });
           const isDeclined = error => error instanceof Declined;
@@ -53,7 +50,7 @@ export default ({ namespace, selector, actions }) => {
             persisted: { save: save(["persisted"]) },
             volatile: { save: save(["volatile", namespace]) },
             thread: { fail: conclude("error"), success: conclude("output") },
-            helpers: { takeEarly, takeLatest, isDeclined }
+            helpers: { takeLatest, isDeclined }
           };
           const effect = attempt(action(...params), resources);
           const loading = effect !== fingerprint;

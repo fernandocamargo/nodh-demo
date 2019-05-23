@@ -32,18 +32,18 @@ const actions = {
       .catch(error => {
         thread.fail(!isDeclined(error) && error);
       }),
-  setFlagFromField: checked => ({
-    helpers: { takeEarly },
-    persisted,
-    thread
-  }) =>
-    takeEarly(fakeRequest())
-      .as({ success: true })
+  setFlagFromField: checked => ({ persisted, thread }) => {
+    persisted.save(setFlag(checked));
+
+    return fakeRequest({ success: true })
       .then(({ success }) => {
-        persisted.save(setFlag(checked));
         thread.success("Updated!");
       })
-      .catch(error => thread.fail(error))
+      .catch(error => {
+        persisted.save(setFlag(!checked));
+        thread.fail(error);
+      });
+  }
 };
 
 // selector
