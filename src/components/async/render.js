@@ -41,8 +41,9 @@ const actions = {
       .as({ success: true })
       .then(({ success }) => {
         persisted.save(setFlag(checked));
-        thread.success();
+        thread.success("Updated!");
       })
+      .catch(error => thread.fail(error))
 };
 
 // selector
@@ -57,7 +58,8 @@ export default () => {
     selector,
     actions
   });
-  const thread = last(useLog({ action: setNameFromField }));
+  const nameThread = last(useLog({ action: setNameFromField }));
+  const flagThread = last(useLog({ action: setFlagFromField }));
   const changeToUpdateName = useCallback(
     ({ target: { value } }) => setNameFromField(value),
     [setNameFromField]
@@ -73,15 +75,16 @@ export default () => {
       <div>
         <p>Your name: {name}</p>
         <input defaultValue={name} onChange={changeToUpdateName} />
-        <Thread {...thread} />
+        {nameThread.loading && <strong> loading...</strong>}
+        <Thread {...nameThread} />
       </div>
       <div>
-        <input
-          type="checkbox"
-          defaultChecked={flag}
-          onChange={changeToUpdateFlag}
-        />
-        <span> Some flag</span>
+        <label>
+          <input type="checkbox" checked={flag} onChange={changeToUpdateFlag} />
+          <span> some persisted flag</span>
+          {flagThread.loading && <strong> loading...</strong>}
+        </label>
+        <Thread {...flagThread} />
       </div>
     </div>
   );
