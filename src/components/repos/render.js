@@ -2,13 +2,10 @@ import last from "lodash/last";
 import without from "lodash/without";
 import React, { useState, useCallback } from "react";
 
+import sleep from "helpers/promise/sleep";
 import { useActions, useLog } from "hooks";
 import Repo from "components/repo";
 import Thread from "components/thread";
-
-// helpers
-const sleep = duration =>
-  new Promise(resolve => window.setTimeout(resolve, duration));
 
 // services
 const getGithubAPI = () =>
@@ -46,7 +43,7 @@ const toggleLike = id => ({ liked = [], ...state }) => ({
 
 // actions
 const actions = {
-  getRepos: ({ persisted, volatile, thread }) => () =>
+  getRepos: () => ({ persisted, volatile, thread }) =>
     fetchGithubRepos()
       .then(({ items, total_count }) => {
         volatile.save(setRepos(items));
@@ -56,11 +53,15 @@ const actions = {
       })
       .catch(({ message }) => thread.fail(message))
       .finally(() => persisted.save(newAttempt())),
-  like: ({ persisted, thread }) => id =>
-    sleep(5000).then(() => {
-      persisted.save(toggleLike(id));
-      thread.success();
-    })
+  like: id => ({ persisted, thread }) =>
+    sleep({ duration: 5000 })
+      .then(() => {
+        persisted.save(toggleLike(id));
+        thread.success();
+      })
+      .catch(() => {
+        thread.fail("LOL, didn't work");
+      })
 };
 
 // selector
@@ -73,7 +74,7 @@ const selector = ({
   repos
 });
 
-export default ({ onUnmount }) => {
+export default () => {
   const [
     { attempts = 0, liked = [], repos = [] },
     { getRepos, like }
@@ -90,7 +91,6 @@ export default ({ onUnmount }) => {
     () => setCounter(incrementCounter()),
     []
   );
-  const clickToUnmount = useCallback(() => onUnmount(), [onUnmount]);
   const renderRepos = useCallback(
     repo => {
       const { id } = repo;
@@ -104,7 +104,6 @@ export default ({ onUnmount }) => {
     <div>
       <h1>Github repos for "React"</h1>
       <h2>Counter: {counter}</h2>
-      <button onClick={clickToUnmount}>Unmount</button>
       <button onClick={clickToIncrementCounter}>Increment counter</button>
       <h2>Attempts to fetch repos: {attempts}</h2>
       <button onClick={clickToGetRepos} disabled={loading}>

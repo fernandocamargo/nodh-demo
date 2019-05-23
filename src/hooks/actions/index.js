@@ -5,12 +5,17 @@ import { v4 } from "uuid";
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
+import stringify from "helpers/object/stringify";
 import replace from "helpers/object/replace";
+import Proxy from "helpers/promise/proxy";
+import Declined from "helpers/error/declined";
 import { NODH } from "constants/index";
 import { log } from "store";
 import { start, finish, clear } from "mutations";
 import { volatile } from "actions";
 import select from "selectors";
+
+const proxy = new Proxy();
 
 export default ({ namespace, selector, actions }) => {
   const dispatch = useDispatch();
@@ -19,8 +24,8 @@ export default ({ namespace, selector, actions }) => {
     selector
   ]);
   const connect = useCallback(
-    (path, callback) => {
-      const identity = md5(callback);
+    (path, action) => {
+      const identity = md5(action);
       const location = [namespace].concat(path);
       const fingerprint = md5(JSON.stringify({ identity, location }));
 
@@ -28,7 +33,9 @@ export default ({ namespace, selector, actions }) => {
         (...params) => {
           const thread = v4();
           const typify = level =>
-            `${NODH}: [${first(level)}] ${location.join(".")}();`;
+            `${NODH}: [${first(level)}] ${location.join(".")}(${stringify(
+              params
+            )});`;
           const save = path => mutation => {
             dispatch({ type: typify(path), path, mutation });
 
@@ -36,14 +43,19 @@ export default ({ namespace, selector, actions }) => {
           };
           const conclude = type => content =>
             log.update(finish({ [type]: content, thread }));
-          const effect = attempt(
-            callback({
-              persisted: { save: save(["persisted"]) },
-              volatile: { save: save(["volatile", namespace]) },
-              thread: { fail: conclude("error"), success: conclude("output") }
-            }),
-            ...params
-          );
+          const takeEarly = promise => ({
+            as: mock => promise
+          });
+          const takeLatest = promise =>
+            proxy.run(promise, { name: fingerprint, value: thread });
+          const wasDeclined = error => error instanceof Declined;
+          const resources = {
+            persisted: { save: save(["persisted"]) },
+            volatile: { save: save(["volatile", namespace]) },
+            thread: { fail: conclude("error"), success: conclude("output") },
+            helpers: { takeEarly, takeLatest, wasDeclined }
+          };
+          const effect = attempt(action(...params), resources);
           const loading = effect !== fingerprint;
           const asynchronous = effect instanceof Promise;
 

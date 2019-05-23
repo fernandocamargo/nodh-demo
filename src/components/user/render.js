@@ -7,8 +7,7 @@ const setName = name => state => ({ ...state, name });
 
 // actions
 const actions = {
-  setNameFromField: ({ persisted, volatile, thread }) => name =>
-    persisted.save(setName(name))
+  setNameFromField: name => ({ persisted }) => persisted.save(setName(name))
 };
 
 // selector

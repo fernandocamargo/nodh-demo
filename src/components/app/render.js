@@ -3,6 +3,7 @@ import React, { useState, useCallback, Fragment } from "react";
 import Curse from "components/provider";
 import User from "components/user";
 import Repos from "components/repos";
+import Async from "components/async";
 
 export default () => {
   const [mounted, setMounted] = useState(true);
@@ -11,14 +12,19 @@ export default () => {
 
   return (
     <Curse>
-      {!!mounted ? (
-        <Fragment>
-          <User />
-          <Repos onUnmount={toggleMount} />
-        </Fragment>
-      ) : (
-        <button onClick={clickToToggleMount}>Mount</button>
-      )}
+      <Fragment>
+        <button onClick={clickToToggleMount}>Toggle mount</button>
+        <hr />
+        {!!mounted && (
+          <Fragment>
+            <User />
+            <hr />
+            <Repos />
+            <hr />
+            <Async />
+          </Fragment>
+        )}
+      </Fragment>
     </Curse>
   );
 };
