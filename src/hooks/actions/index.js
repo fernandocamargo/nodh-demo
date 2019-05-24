@@ -16,6 +16,7 @@ import { volatile } from "actions";
 import select from "selectors";
 
 const proxy = new Proxy();
+const instances = new Map();
 
 export default ({ namespace, selector, actions }) => {
   const dispatch = useDispatch();
@@ -37,11 +38,13 @@ export default ({ namespace, selector, actions }) => {
               params
             )});`;
           const save = path => mutation => {
-            dispatch({ type: typify(path), path, mutation });
+            instances.has(namespace) &&
+              dispatch({ type: typify(path), path, mutation });
 
             return fingerprint;
           };
           const conclude = type => content =>
+            instances.has(namespace) &&
             log.update(finish({ [type]: content, thread }));
           const takeLatest = promise =>
             proxy.run(promise, { name: fingerprint, value: thread });
@@ -75,6 +78,8 @@ export default ({ namespace, selector, actions }) => {
   useEffect(() => {
     const { mount, unmount } = replace(volatile).with(connect);
 
+    instances.set(namespace);
+
     mount();
 
     return () => {
@@ -85,9 +90,11 @@ export default ({ namespace, selector, actions }) => {
 
       unmount();
 
+      log.update(clear({ namespace }));
+
       proxy.clear(actions);
 
-      log.update(clear({ namespace }));
+      instances.delete(namespace);
     };
   }, [connect, namespace]);
 
