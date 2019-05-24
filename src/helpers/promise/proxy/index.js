@@ -1,3 +1,5 @@
+import isEqual from "lodash/isEqual";
+
 import Declined from "helpers/error/declined";
 
 export default class {
@@ -18,7 +20,7 @@ export default class {
     return response => {
       const { instances, reject, resolve } = this;
       const instance = instances.get(name);
-      const skip = value !== instance;
+      const skip = !isEqual(value, instance);
 
       return skip ? reject(response) : resolve(response);
     };
@@ -30,5 +32,15 @@ export default class {
 
   reject(response) {
     return Promise.reject(new Declined(response));
+  }
+
+  remove(name) {
+    this.instances.delete(name);
+  }
+
+  clear(names) {
+    const { remove } = this;
+
+    return names.forEach(remove.bind(this));
   }
 }

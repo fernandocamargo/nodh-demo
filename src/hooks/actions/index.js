@@ -78,7 +78,14 @@ export default ({ namespace, selector, actions }) => {
     mount();
 
     return () => {
+      const {
+        currentState: { namespaces }
+      } = log;
+      const actions = Array.from(namespaces.get(namespace));
+
       unmount();
+
+      proxy.clear(actions);
 
       log.update(clear({ namespace }));
     };
