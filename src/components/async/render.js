@@ -79,12 +79,17 @@ export default () => {
         <Thread {...nameThread} />
       </div>
       <div>
+        <h2>Optimisc update</h2>
         <label>
           <input type="checkbox" checked={flag} onChange={changeToUpdateFlag} />
           <span> some persisted flag</span>
           {flagThread.loading && <strong> loading...</strong>}
         </label>
         <Thread {...flagThread} />
+      </div>
+      <div>
+        <h2>Undoable action</h2>
+        <button>Save somethingc (you can undo within a few seconds)</button>
       </div>
     </div>
   );
