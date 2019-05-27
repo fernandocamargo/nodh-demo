@@ -1,23 +1,15 @@
 {
-  "name": "nodh",
-  "homepage": "http://fernandocamargo.com/nodh",
+  "name": "nodh-demo",
+  "homepage": "http://fernandocamargo.com/nodh-demo",
   "version": "0.1.0",
   "private": false,
   "dependencies": {
-    "immutability-helper": "^3.0.0",
     "lodash": "^4.17.11",
-    "md5": "^2.2.1",
+    "nodh": "^1.0.4",
     "prop-types": "^15.7.2",
-    "pullstate": "^0.8.0-beta.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-redux": "next",
-    "react-scripts": "^3.0.1",
-    "redux": "^4.0.1",
-    "redux-devtools-extension": "^2.13.8",
-    "redux-persist": "^5.10.0",
-    "reselect": "^4.0.0",
-    "uuid": "^3.3.2"
+    "react-scripts": "^3.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -33,9 +25,5 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ],
-  "devDependencies": {
-    "react-hooks-testing-library": "^0.5.0",
-    "react-test-renderer": "^16.8.6"
-  }
+  ]
 }

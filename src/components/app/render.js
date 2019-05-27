@@ -1,9 +1,7 @@
 import React, { useState, useCallback, Fragment } from "react";
+import { Provider as Curse } from "nodh";
 
-import Curse from "components/provider";
-import User from "components/user";
-import Repos from "components/repos";
-import Async from "components/async";
+import { Async, Repos, User } from "components";
 
 export default () => {
   const [mounted, setMounted] = useState(true);

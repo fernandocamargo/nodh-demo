@@ -1,8 +1,8 @@
 import last from "lodash/last";
 import React, { useCallback } from "react";
+import { useLog } from "nodh";
 
-import { useLog } from "hooks";
-import Thread from "components/thread";
+import { Thread } from "components";
 
 export default ({
   id,

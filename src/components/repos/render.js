@@ -1,11 +1,10 @@
 import last from "lodash/last";
 import without from "lodash/without";
 import React, { useState, useCallback } from "react";
+import { useActions, useLog } from "nodh";
 
 import sleep from "helpers/promise/sleep";
-import { useActions, useLog } from "hooks";
-import Repo from "components/repo";
-import Thread from "components/thread";
+import { Repo, Thread } from "components";
 
 // services
 const getGithubAPI = () =>

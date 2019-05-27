@@ -1,10 +1,10 @@
 import random from "lodash/random";
 import last from "lodash/last";
 import React, { useCallback } from "react";
+import { useActions, useLog } from "nodh";
 
 import sleep from "helpers/promise/sleep";
-import { useActions, useLog } from "hooks";
-import Thread from "components/thread";
+import { Thread } from "components";
 
 // helpers
 const latency = () => random(0.5, 5) * 1000;
