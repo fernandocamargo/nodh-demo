@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": false,
   "dependencies": {
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "nodh": "^1.0.4",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
